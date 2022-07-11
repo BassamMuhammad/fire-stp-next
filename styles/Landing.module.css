@@ -1,0 +1,176 @@
+.videoWrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+}
+
+.videoWrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 77%;
+    height: 77%;
+    margin: 0 11% 0 11%;
+}
+
+.centered {
+    display: grid;
+    align-items: center;
+    padding: 20px;
+}
+
+.text {
+    justify-self: center;
+    text-align: center;
+}
+
+.h1 {
+    font-weight: bolder;
+    font-size: 3rem;
+    color: aqua;
+}
+
+.h2 {
+    font-weight: bold;
+    font-size: 2.5rem;
+}
+
+.superP {
+    font-weight: 400;
+    font-size: 2rem;
+    word-spacing: 4px;
+    line-height: 2.5rem;
+}
+
+.pageP {
+    font-weight: 400;
+    font-size: 24px;
+    word-spacing: 4px;
+    line-height: 30px;
+}
+
+.offerPone {
+    color: aqua;
+    font-weight: 600;
+    font-size: 25px;
+}
+
+.offerPtwo {
+    color: #2d2d2d;
+    font-weight: 600;
+    font-size: 21px;
+}
+
+.priceGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(33%, 1fr));
+    justify-self: center;
+}
+
+.priceOne {
+    color: #2d2d2d;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.priceTwo {
+    color: aqua;
+    font-weight: 600;
+    font-size: 27px;
+}
+
+.discount {
+    color: #2d2d2d;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.superUnderlined {
+    padding: 7px 0 8px 0;
+    color: #f7f7f7;
+    background-color: aqua;
+    font-weight: 400;
+    font-size: 2rem;
+    word-spacing: 4px;
+    line-height: 2.5rem;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.iconsBoxContainer {
+    display: grid;
+    align-items: center;
+    padding: 25px 60px 25px 60px;
+    color: #f7f7f7;
+    background-color: #2d2d2d;
+}
+
+.iconsBox {
+    border-radius: 6px;
+    color: #2d2d2d;
+    background-color: #f7f7f7;
+    padding: 25px 15px 60px 15px;
+}
+
+.iconsBoxGrid {
+    display: grid;
+    grid-template-rows: 33% 33% 33%;
+    grid-template-columns: 35% 65%;
+    column-gap: 0.5rem;
+}
+
+.iconedboxXL {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    height: 96px;
+    font-size: 64px;
+    line-height: 1em;
+}
+
+.iconP {
+    font-size: 18px;
+}
+
+.hrOne {
+    border: 1px solid aqua;
+}
+
+.footer {
+    position: relative;
+    bottom: 0 !important;
+    width: 100%;
+    padding: 50px 30px 50px 80px;
+    color: #f7f7f7;
+    background-color: #111111;
+}
+
+@media (max-width: 450px) {
+    .h1 {
+        font-weight: bolder;
+        font-size: 2.5rem;
+        color: aqua;
+    }   
+    .h2 {
+        font-weight: bold;
+        font-size: 2rem;
+    }
+    .pageP {
+        font-weight: 300;
+        font-size: 18px;
+        word-spacing: 3px;
+        line-height: 24px;
+    }
+    .iconsBoxGrid {
+        display: grid;
+        grid-template-rows: 10%;
+        grid-template-columns: 90%;
+        column-gap: 0.2rem;
+    }
+    .iconsBoxContainer {
+        display: grid;
+        align-items: center;
+        padding: 0;
+        background-color: #2d2d2d;
+    }
+}
