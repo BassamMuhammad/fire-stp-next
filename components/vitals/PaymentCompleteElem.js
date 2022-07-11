@@ -9,7 +9,7 @@ export const PaymentCompleteElem = () => {
 
   useEffect(() => {
     fetch("/api/payment_intent").then(r => r.json())
-    .then((data) => setClientSecret(data.clientSecret))
+    .then(data => setClientSecret(data.clientSecret))
   }, [])
 
   const appearance = {
