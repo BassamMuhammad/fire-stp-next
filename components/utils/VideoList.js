@@ -1,36 +1,36 @@
 import React, { useEffect, useState } from "react";
 import styles from "../../styles/VideoList.module.css";
-import firebase from "../../firebase/base";
 import Link from "next/link";
-// import { userEmail } from "../../firebase/user";
-const auth = firebase.auth();
-const db = firebase.firestore();
+import nookies from 'nookies';
+import adminFirebase from '../../firebase/firebaseAdmin';
 
-export const VideoList = () => {
+export default function VideoList({ userEmail }) {
+  const db = adminFirebase.firestore();
   const [videos, setVideos] = useState([]);
   const [views, setViews] = useState([]);
-  const currentEmail = auth.currentUser.email;
 
   useEffect(() => {
     const fetchData = async () => {
       const coll = await db.collection("videos").get();
-      setVideos(
-        coll.docs.map((doc) => {
-          return doc.data();
-        })
-      );
+      const collDocs = coll.docs;
+      const data = [];
+      collDocs.forEach(async (doc) => {
+        data.push(await doc.data());
+      });
+      setVideos(data);
     };
     fetchData();
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const coll = await db.collection("users").doc("eliascardonarod@gmail.com").collection("videos").where("viewed", "==", "true")
-      setViews(
-        coll.docs.map(doc => {
-          return doc.data();
-        })
-      );
+      const coll = await db.collection("users").doc(userEmail).collection("videos").where("viewed", "==", "true")
+      const collDocs = coll.docs;
+      const data = [];
+      collDocs.forEach(async (doc) => {
+        data.push(await doc.data());
+      });
+      setViews(data);
     };
     fetchData();
   }, []);
@@ -65,5 +65,20 @@ export const VideoList = () => {
         );
       })}
     </div>
-  );
-};
+  )
+}
+
+export const getServerSideProps = async (ctx) => {
+  try {
+    const cookies = nookies.get(ctx)
+    const token = await adminFirebase.auth().verifyIdToken(cookies.token)
+    const { email } = token
+    return {
+      props: { userEmail: `${email}` }
+    }
+  } catch (err) {
+    return {
+      props: {}
+    }
+  }
+}

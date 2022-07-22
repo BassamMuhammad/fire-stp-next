@@ -1,5 +1,6 @@
 import Head from "next/head"
 import Script from "next/script"
+import { AuthProvider } from "../contexts/AuthContext"
 import "../styles/globals.css"
 
 function MyApp({ Component, pageProps }) {
@@ -16,7 +17,9 @@ function MyApp({ Component, pageProps }) {
       integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" 
       crossOrigin="anonymous" />
       <Script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js" />
-      <Component {...pageProps} />
+      <AuthProvider>
+        <Component {...pageProps} />
+      </AuthProvider>
     </>
   )
 }

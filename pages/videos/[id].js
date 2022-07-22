@@ -3,15 +3,13 @@ import { Header } from "../../components/utils/Header";
 import { VideoList } from "../../components/utils/VideoList";
 import styles from "../../styles/id.module.css";
 import { useRouter } from "next/router";
-import firebase from "../../firebase/base";
 import YouTube from "react-youtube";
-// import { userEmail } from "../../firebase/user";
+import nookies from 'nookies';
+import adminFirebase from '../../firebase/firebaseAdmin';
 
-const Details = () => {
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+export default function Details({ userEmail }) {
+  const db = adminFirebase.firestore();
   const router = useRouter();
-  const currentEmail = auth.currentUser.email;
   const [videoId, setVideoId] = useState("");
   const { id } = router.query;
   useEffect(() => {
@@ -29,7 +27,7 @@ const Details = () => {
   }
 
   const onVideoEnd = async () => {
-    await db.collection("users").doc("eliascardonarod@gmail.com").collection("videos").doc(videoId).set({
+    await db.collection("users").doc(userEmail).collection("videos").doc(videoId).set({
       viewed: "true"
     })
   }
@@ -39,13 +37,8 @@ const Details = () => {
       <Header login="false" />
       <div className={styles.grid}>
         <div className={styles.i1}>
-          {/* iframe with the correspond src */}
           <div className={styles.videoWrapper}>
-            <YouTube
-            videoId={id}
-            opts={opts}
-            onEnd={onVideoEnd}
-            />
+            <YouTube videoId={id} opts={opts} onEnd={onVideoEnd} />
           </div>
           <div className={styles.line}>
             <p>
@@ -62,7 +55,20 @@ const Details = () => {
         <VideoList />
       </div>
     </>
-  );
-};
+  )
+}
 
-export default Details;
+export const getServerSideProps = async (ctx) => {
+  try {
+    const cookies = nookies.get(ctx)
+    const token = await adminFirebase.auth().verifyIdToken(cookies.token)
+    const { email } = token
+    return {
+      props: { userEmail: `${email}` }
+    }
+  } catch (err) {
+    return {
+      props: {}
+    }
+  }
+}

@@ -6,21 +6,19 @@ import { Header } from "../../components/utils/Header";
 import { InfoModal } from "../../components/utils/InfoModal";
 import { Login } from "../../components/vitals/Login";
 import firebase from "../../firebase/base";
-const db = firebase.firestore();
 
 const videos = () => {
+  const db = firebase.firestore();
   const [videos, setVideos] = useState([]);
   useEffect(() => {
     const getVideos = async () => {
       const coll = await db.collection("videos").get();
-      console.log({ coll });
       const collDocs = coll.docs;
       const data = [];
       collDocs.forEach(async (doc) => {
         data.push(await doc.data());
       });
       setVideos(data);
-      console.log(data);
     };
     getVideos();
   }, []);

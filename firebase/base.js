@@ -13,6 +13,7 @@ if (!Firebase.apps.length) {
     messagingSenderId: "633991934926",
     appId: "1:633991934926:web:ed87ff0a704a792e4b319f",
   })
+  firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
 } else {
   firebase = Firebase.app()
 }
