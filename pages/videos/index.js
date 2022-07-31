@@ -1,33 +1,33 @@
 import React, { useEffect, useState } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 import Link from "next/link";
 import styles from "../../styles/PremiumView.module.css";
 import { Header } from "../../components/utils/Header";
 import { InfoModal } from "../../components/utils/InfoModal";
 import { Login } from "../../components/vitals/Login";
-import firebase from "../../firebase/base";
+import { firestore, auth } from "../../firebase/base";
+import { collection, getDocs } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 
 const videos = () => {
-  const db = firebase.firestore();
   const [videos, setVideos] = useState([]);
   useEffect(() => {
     const getVideos = async () => {
-      const coll = await db.collection("videos").get();
+      const coll = await getDocs(collection(firestore, "videos"));
       const collDocs = coll.docs;
       const data = [];
       collDocs.forEach(async (doc) => {
-        data.push(await doc.data());
+        data.push(doc.data());
       });
       setVideos(data);
     };
     getVideos();
   }, []);
 
-  const auth = firebase.auth()
   const logOut = async () => {
-    await auth.signOut()
-    window.location.reload()
-  }
+    await signOut();
+    window.location.reload();
+  };
 
   return (
     <>
@@ -53,7 +53,13 @@ const videos = () => {
             odio libero modi maxime dignissimos necessitatibus laudantium
             mollitia!
           </p>
-          <button type='button' className='btn btn-dark ml-3 mb-3' onClick={logOut}>Log out</button>
+          <button
+            type="button"
+            className="btn btn-dark ml-3 mb-3"
+            onClick={logOut}
+          >
+            Log out
+          </button>
         </div>
         <div className={styles.i2}>
           <h2 className="pl-3 pb-1 pt-3">Time to study!</h2>

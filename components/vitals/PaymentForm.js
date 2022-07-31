@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import firebase from "../../firebase/base";
-const auth = firebase.auth();
-const db = firebase.firestore();
-const functions = firebase.functions();
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { auth, firestore, firebaseFunctions } from "../../firebase/base";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 
 export default function PaymentForm() {
   const stripe = useStripe();
   const elements = useElements();
-  const setPremiumUser = functions.httpsCallable("setPremiumUser");
+  const setPremiumUser = httpsCallable(firebaseFunctions, "setPremiumUser");
   const [userEmail, setUserEmail] = useState("");
   const [username, setUsername] = useState("");
 
   useEffect(() => {
     const checkUserEmail = () => {
-      auth.onAuthStateChanged((user) => {
+      onAuthStateChanged(auth, (user) => {
         if (user) {
           setUserEmail(user.email);
         }
@@ -25,7 +29,7 @@ export default function PaymentForm() {
 
   useEffect(() => {
     const checkUser = async () => {
-      const user = (await db.collection("users").doc(userEmail).get()).data();
+      const user = (await getDoc(doc(firestore, `users/${userEmail}`))).data();
       setUsername(user.nombre);
     };
     if (userEmail) checkUser();
@@ -33,10 +37,10 @@ export default function PaymentForm() {
 
   useEffect(() => {
     if (!stripe) {
-      return
+      return;
     }
     if (!userEmail) {
-      return
+      return;
     }
 
     const clientSecret = new URLSearchParams(window.location.search).get(

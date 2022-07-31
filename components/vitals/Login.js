@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import firebase from "../../firebase/base";
-const auth = firebase.auth();
+import { auth } from "../../firebase/base";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export const Login = () => {
   const emailRef = useRef();
@@ -10,7 +10,7 @@ export const Login = () => {
     e.preventDefault();
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-    await auth.signInWithEmailAndPassword(email, password);
+    await signInWithEmailAndPassword(auth, email, password);
   };
 
   return (

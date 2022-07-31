@@ -1,21 +1,40 @@
 import React, { useEffect, useState } from "react";
 import styles from "../../styles/VideoList.module.css";
 import Link from "next/link";
-import nookies from 'nookies';
-import adminFirebase from '../../firebase/firebaseAdmin';
+import { firestore, auth } from "../../firebase/base";
+import {
+  collection,
+  getDoc,
+  doc,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
-export default function VideoList({ userEmail }) {
-  const db = adminFirebase.firestore();
+export default function VideoList() {
   const [videos, setVideos] = useState([]);
   const [views, setViews] = useState([]);
+  const [prog, setProg] = useState(0);
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    const checkUserEmail = () => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setUserEmail(user.email);
+        }
+      });
+    };
+    checkUserEmail();
+  });
 
   useEffect(() => {
     const fetchData = async () => {
-      const coll = await db.collection("videos").get();
+      const coll = await getDocs(collection(firestore, "videos"));
       const collDocs = coll.docs;
       const data = [];
       collDocs.forEach(async (doc) => {
-        data.push(await doc.data());
+        data.push(doc.data());
       });
       setVideos(data);
     };
@@ -24,20 +43,17 @@ export default function VideoList({ userEmail }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      const coll = await db.collection("users").doc(userEmail).collection("videos").where("viewed", "==", "true")
-      const collDocs = coll.docs;
-      const data = [];
-      collDocs.forEach(async (doc) => {
-        data.push(await doc.data());
+      onSnapshot(doc(firestore, `users/${userEmail}`), (coll) => {
+        const viewed = coll.get("viewed");
+        setViews(viewed);
       });
-      setViews(data);
     };
-    fetchData();
-  }, []);
+    if (userEmail) fetchData();
+  }, [userEmail]);
 
-  let totalVideos = videos.length;
-  let totalViews = views.length;
-  let prog = (totalViews * 100) / totalVideos;
+  useEffect(() => {
+    setProg((views.length * 100) / videos.length);
+  }, [videos, views]);
 
   return (
     <div className={styles.i2}>
@@ -57,28 +73,11 @@ export default function VideoList({ userEmail }) {
         return (
           <Link href={`/videos/${video.id}`} key={`${video.id}`}>
             <a style={{ color: "inherit", textDecoration: "none" }}>
-              <div className={styles.lines}>
-                Lesson {video.id}
-              </div>
+              <div className={styles.lines}>Lesson {video.id}</div>
             </a>
           </Link>
         );
       })}
     </div>
-  )
-}
-
-export const getServerSideProps = async (ctx) => {
-  try {
-    const cookies = nookies.get(ctx)
-    const token = await adminFirebase.auth().verifyIdToken(cookies.token)
-    const { email } = token
-    return {
-      props: { userEmail: `${email}` }
-    }
-  } catch (err) {
-    return {
-      props: {}
-    }
-  }
+  );
 }

@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
-import firebase from "../../firebase/base";
-const auth = firebase.auth();
-const db = firebase.firestore();
+import { auth, firestore } from "../../firebase/base";
+import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
 
 export const Signup = ({ setStep }) => {
   const emailRef = useRef();
@@ -13,17 +13,18 @@ export const Signup = ({ setStep }) => {
     const name = nameRef.current.value;
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-    const res = await auth.createUserWithEmailAndPassword(email, password);
-    await db.collection("users").doc(res.user.email).set({
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    await updateDoc(doc(firestore, `users/${res.user.email}`), {
       nombre: name,
       email: res.user.email,
       id: res.user.uid,
+      viewed: [],
     });
     setStep(1);
   };
 
   const logOut = async () => {
-    await auth.signOut();
+    await signOut(auth);
     window.location.reload();
   };
 

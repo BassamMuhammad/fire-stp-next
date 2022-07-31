@@ -1,36 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { Header } from "../../components/utils/Header";
-import { VideoList } from "../../components/utils/VideoList";
+import VideoList from "../../components/utils/VideoList";
 import styles from "../../styles/id.module.css";
 import { useRouter } from "next/router";
 import YouTube from "react-youtube";
-import nookies from 'nookies';
-import adminFirebase from '../../firebase/firebaseAdmin';
+import { auth, firestore } from "../../firebase/base";
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
-export default function Details({ userEmail }) {
-  const db = adminFirebase.firestore();
+export default function Details() {
   const router = useRouter();
   const [videoId, setVideoId] = useState("");
   const { id } = router.query;
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    const checkUserEmail = () => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          setUserEmail(user.email);
+        }
+      });
+    };
+    checkUserEmail();
+  });
+
   useEffect(() => {
     const getVideo = async () => {
-      const coll = await db.doc(`videos/${id}`).get();
-      setVideoId(coll.get("id"));
+      const coll = await getDoc(doc(firestore, `videos/${id}`));
+      setVideoId(id);
     };
     getVideo();
   }, [id]);
 
   const opts = {
     playerVars: {
-      frameborder:0
-    }
-  }
+      frameborder: 0,
+    },
+  };
 
   const onVideoEnd = async () => {
-    await db.collection("users").doc(userEmail).collection("videos").doc(videoId).set({
-      viewed: "true"
-    })
-  }
+    await updateDoc(doc(firestore, `users/${userEmail}`), {
+      viewed: arrayUnion(videoId),
+    });
+  };
 
   return (
     <>
@@ -55,20 +68,5 @@ export default function Details({ userEmail }) {
         <VideoList />
       </div>
     </>
-  )
-}
-
-export const getServerSideProps = async (ctx) => {
-  try {
-    const cookies = nookies.get(ctx)
-    const token = await adminFirebase.auth().verifyIdToken(cookies.token)
-    const { email } = token
-    return {
-      props: { userEmail: `${email}` }
-    }
-  } catch (err) {
-    return {
-      props: {}
-    }
-  }
+  );
 }
